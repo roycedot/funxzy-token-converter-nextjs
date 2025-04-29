@@ -1,8 +1,16 @@
 Fun.xyz - a feature for a crypto platform where users can explore potential token swaps. They need a simple tool to select two tokens (a source and a target) and input a USD amount to see the approximate equivalent amounts in those tokens.
 
-## Getting Started
+## Running Locally
 
-1. Make sure the FUN_API_KEY environment variable is set to a key that works with 
+1. Make sure the FUN_API_KEY environment variable is set to a key that works with @funkit/api-base. For example, set it in .env.local
+2. ```npm install```
+3. ```npm run dev```
+
+## Currency API Calls Setup (front-end vs back-end)
+
+Accessing the Fun.xyz Base API is done through Route Handlers (server-side). The front-end calls Next back-end end-points, which, in turn, make calls using the Fun.xyz library.
+
+This ensures API keys aren't exposed by the front-end.
 
 ## Currency API tradeoffs/assumptions
 
