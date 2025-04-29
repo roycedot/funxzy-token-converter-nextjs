@@ -6,6 +6,12 @@ Fun.xyz - a feature for a crypto platform where users can explore potential toke
 2. ```npm install```
 3. ```npm run dev```
 
+I'm using Node v20.11.1 through 'nvm' NOTE: there is a .nvmrc file so you can do:
+
+```nvm use```
+
+if you use nvm
+
 ## Currency API Calls Setup (front-end vs back-end)
 
 Accessing the Fun.xyz Base API is done through Route Handlers (server-side). The front-end calls Next back-end end-points, which, in turn, make calls using the Fun.xyz library.
@@ -50,6 +56,10 @@ And, it would, arguably, be a more useful product if it could show more than 2 c
 
 ## Libraries
 
-I used Hero UI for the components.
+I used Hero UI for the components. The styling code is succinct and I like the aesthetic.
 
 Raw TailWind seemed like it may be too verbose, and Material UI could maybe be too restrictive.
+
+## Vercel Deployment
+
+The app is deployed on Vercel at 
