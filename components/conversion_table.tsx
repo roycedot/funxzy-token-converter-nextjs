@@ -15,6 +15,7 @@ import { useState } from "react";
 import { TOKEN_SYMBOL_TO_CHAIN_ID } from "@/app/constants";
 import { subtitle } from "@/components/primitives";
 import { readTokenUnitPrice } from "@/utils/funxyz_api";
+import { ExchangeRateTableEntry } from "@/types";
 
 export default function ConversionTable() {
   const [amountInUSD, setAmountInUSD] = useState<string>("1");
@@ -25,8 +26,7 @@ export default function ConversionTable() {
     new Set<string>(),
   );
   const [exchangeRateTable, setExchangeRateTable] = useState<{
-    // TODO: define type
-    [key: string]: { [key: string]: Date | number };
+    [key: string]: ExchangeRateTableEntry;
   }>({});
 
   function onGetPriceInfoError(tokenId: string, error: string) {
@@ -85,12 +85,9 @@ export default function ConversionTable() {
       );
 
       if (unitPrice) {
-        // TODO: use custom type
         // TODO: use spread syntax + prevState instead
-        const newExchangeRateTable: { [key: string]: { [key: string]: Date | number } } = Object.assign(
-          {},
-          exchangeRateTable,
-        );
+        const newExchangeRateTable: { [key: string]: ExchangeRateTableEntry } =
+          Object.assign({}, exchangeRateTable);
 
         const existing = exchangeRateTable[tokenId];
 
@@ -202,19 +199,16 @@ export default function ConversionTable() {
                 } else {
                   const tokenExchangeRateInfo = exchangeRateTable[tokenId];
 
-                  // @ts-ignore
-                  const converted = convertFromUSDTo(tokenExchangeRateInfo?.unitPrice)
-                  // @ts-ignore
-                  const unitPrice = tokenExchangeRateInfo?.unitPrice;
-                  // @ts-ignore
-                  const formattedLastUpdDateTimeStr = formatDateTime(tokenExchangeRateInfo?.lastUpdDateTime);
-
                   return (
                     <TableRow key={tokenId}>
                       <TableCell>{tokenId}</TableCell>
-                      <TableCell>{converted}</TableCell>
-                      <TableCell>{unitPrice?.toString()}</TableCell>
-                      <TableCell>{formattedLastUpdDateTimeStr}</TableCell>
+                      <TableCell>
+                        {convertFromUSDTo(tokenExchangeRateInfo?.unitPrice)}
+                      </TableCell>
+                      <TableCell>{tokenExchangeRateInfo?.unitPrice}</TableCell>
+                      <TableCell>
+                        {formatDateTime(tokenExchangeRateInfo?.lastUpdDateTime)}
+                      </TableCell>
                     </TableRow>
                   );
                 }

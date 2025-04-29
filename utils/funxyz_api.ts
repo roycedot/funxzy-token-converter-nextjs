@@ -1,9 +1,10 @@
+import { ExchangeRateTableEntry } from "@/types";
+
 /** helper module to access Fun.xyz API through our own API Routes */
 export const readTokenUnitPrice = async (
   tokenId: string,
   exchangeRateTable: {
-    // TODO: define type
-    [key: string]: { [key: string]: Date | number };
+    [key: string]: ExchangeRateTableEntry;
   },
   onError: (tokenId: string, errorMsg: string) => void,
 ): Promise<number | null> => {
@@ -37,11 +38,22 @@ export const readTokenUnitPrice = async (
     }
   }
 
+  if (!exchangeRateInfo.tokenAddress) {
+    // should never happen - mostly to suppress TS warnings
+    onError(
+      tokenId,
+      "Something bad happened. No tokenAddress when trying to " +
+        "call /token_price_info",
+    );
+
+    return null;
+  }
+
   const url =
     "/api/fun/token_price_info?" +
     new URLSearchParams({
       tokenId,
-      tokenAddress: exchangeRateInfo.tokenAddress.toString(),
+      tokenAddress: exchangeRateInfo.tokenAddress,
     }).toString();
   const res = await fetch(url);
 

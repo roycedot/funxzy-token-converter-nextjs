@@ -62,4 +62,4 @@ Raw TailWind seemed like it may be too verbose, and Material UI could maybe be t
 
 ## Vercel Deployment
 
-The app is deployed on Vercel at 
+The app is deployed on Vercel at https://funxzy-token-converter-nextjs-pa7x.vercel.app
