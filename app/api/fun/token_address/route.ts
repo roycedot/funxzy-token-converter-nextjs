@@ -1,9 +1,11 @@
 import { NextApiRequest } from "next";
 import { getAssetErc20ByChainAndSymbol } from "@funkit/api-base";
+import { NextRequest } from "next/server";
 
 import { FUN_API_KEY, TOKEN_SYMBOL_TO_CHAIN_ID } from "@/app/constants";
 
-export async function GET(request: NextApiRequest) {
+
+export async function GET(request: NextRequest) {
   if (!FUN_API_KEY) {
     const data = {
       error: "FUN_API_KEY needs to be set on the server",
