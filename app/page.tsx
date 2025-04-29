@@ -1,6 +1,7 @@
 "use client";
 import { Button } from "@heroui/button";
 import { Input } from "@heroui/input";
+import { Progress } from "@heroui/progress";
 import {
   Table,
   TableHeader,
@@ -11,50 +12,97 @@ import {
 } from "@heroui/table";
 import { useState } from "react";
 
-import { TOKEN_SYMBOL_TO_CHAIN_ID } from "./constants";
+import { TOKEN_SYMBOL_TO_CHAIN_ID, FUN_API_KEY } from "./constants";
 
 import { subtitle } from "@/components/primitives";
+import { readTokenUnitPrice } from "@/app/funxyz_api";
 
 export default function Home() {
   const [amountInUSD, setAmountInUSD] = useState<string>("1");
-  const [selectedCurrencies, setSelectedCurrencies] = useState<Array<string>>(
+  const [selectedTokenIds, setSelectedTokenIds] = useState<Array<string>>(
     [],
   );
+  const [loadingTokenIds, setLoadingTokenIds] = useState<Set<string>>(
+    new Set<string>(),
+  );
   const [exchangeRateTable, setExchangeRateTable] = useState<{
-    [key: string]: number;
-  }>({
-    ETH: 1500,
-  });
+    // TODO: define type
+    [key: string]: { [key: string]: Date | number };
+  }>({});
 
-  function toggleCurrencySelected(currency: string) {
-    // console.log(currency);
-    // alert('Currency:' + currency)
-    const newSelectedCurrencies = selectedCurrencies.slice();
-    const existingIdx = newSelectedCurrencies.indexOf(currency);
+  async function toggleCurrencySelected(tokenId: string) {
+    const newSelectedTokenIds = selectedTokenIds.slice();
+    const existingIdx = newSelectedTokenIds.indexOf(tokenId);
+
+    let shouldLoadNewCurrency = false;
 
     if (existingIdx >= 0) {
-      newSelectedCurrencies.splice(existingIdx, 1);
-    } else if (newSelectedCurrencies.length > 1) {
-      newSelectedCurrencies.shift();
-      newSelectedCurrencies.push(currency);
+      newSelectedTokenIds.splice(existingIdx, 1);
+    } else if (newSelectedTokenIds.length > 1) {
+      newSelectedTokenIds.shift();
+      newSelectedTokenIds.push(tokenId);
+      shouldLoadNewCurrency = true;
     } else {
-      newSelectedCurrencies.push(currency);
+      newSelectedTokenIds.push(tokenId);
+      shouldLoadNewCurrency = true;
     }
-    setSelectedCurrencies(newSelectedCurrencies);
+    if (shouldLoadNewCurrency) {
+      const newLoadingTokenIds = new Set(loadingTokenIds);
+
+      newLoadingTokenIds.add(tokenId);
+      setLoadingTokenIds(newLoadingTokenIds);
+    }
+    setSelectedTokenIds(newSelectedTokenIds);
+
+    if (shouldLoadNewCurrency) {
+      const unitPrice = await readTokenUnitPrice(tokenId);
+
+      if (unitPrice) {
+        // TODO: use custom type
+        // TODO: use spread syntax + prevState instead
+        const newExchangeRateTable: { [key: string]: { [key: string]: Date | number } } = Object.assign(
+          {},
+          exchangeRateTable,
+        );
+
+        newExchangeRateTable[tokenId] = {
+          unitPrice,
+          lastUpdDateTime: new Date(),
+        };
+        setExchangeRateTable(newExchangeRateTable);
+      } else {
+        // alert error getting unit price
+      }
+
+      const newLoadingTokenIds = new Set(loadingTokenIds);
+
+      newLoadingTokenIds.delete(tokenId);
+      setLoadingTokenIds(newLoadingTokenIds);
+    }
   }
 
-  function onAmountInUSDChange(currency: string) {
-    setAmountInUSD(currency);
+  function onAmountInUSDChange(tokenId: string) {
+    setAmountInUSD(tokenId);
   }
 
-  function convertFromUSDTo(currency: string): string {
-    const unitPrice = exchangeRateTable[currency];
+  function isLoadingTokenInfo(tokenId: string): boolean {
+    return loadingTokenIds.has(tokenId);
+  }
 
+  function convertFromUSDTo(unitPrice: number | null): string {
     if (unitPrice) {
       return (parseFloat(amountInUSD) / unitPrice).toFixed(4).toString();
     }
 
-    return (parseFloat(amountInUSD) * 2).toFixed(4).toString();
+    // shouldn't get here
+    return "";
+  }
+
+  function formatDateTime(date: Date): string {
+    const intermediateString = date.toISOString().replace("T", " ");
+    const periodIdx = intermediateString.indexOf(".");
+
+    return intermediateString.substring(0, periodIdx);
   }
 
   return (
@@ -79,7 +127,7 @@ export default function Home() {
             <Button
               key={tokenId}
               color={
-                selectedCurrencies.indexOf(tokenId) >= 0 ? "primary" : "default"
+                selectedTokenIds.indexOf(tokenId) >= 0 ? "primary" : "default"
               }
               onPress={() => toggleCurrencySelected(tokenId)}
             >
@@ -88,24 +136,44 @@ export default function Home() {
           ))}
       </div>
 
-      {selectedCurrencies.length > 0 && (
+      {selectedTokenIds.length > 0 && (
         <div className="flex gap-3">
           <Table aria-label="Example static collection table">
             <TableHeader>
               <TableColumn>CURRENCY</TableColumn>
-              <TableColumn>TOKENS FOR USD</TableColumn>
+              <TableColumn># TOKENS FOR USD</TableColumn>
               <TableColumn>UNIT PRICE (USD)</TableColumn>
               <TableColumn>XRATE LAST UPDATED</TableColumn>
             </TableHeader>
             <TableBody>
-              {selectedCurrencies.toSorted().map((tokenId) => (
-                <TableRow key={tokenId}>
-                  <TableCell>{tokenId}</TableCell>
-                  <TableCell>{convertFromUSDTo(tokenId)}</TableCell>
-                  <TableCell>{1500}</TableCell>
-                  <TableCell>3 mins ago</TableCell>
-                </TableRow>
-              ))}
+              {selectedTokenIds.toSorted().map((tokenId) => {
+                if (isLoadingTokenInfo(tokenId)) {
+                  return (
+                    <TableRow key={tokenId}>
+                      <TableCell>{tokenId}</TableCell>
+                      <TableCell colSpan={3}>
+                        <Progress
+                          isIndeterminate
+                          aria-label={`Loading ${tokenId}...`}
+                          className="max-w-sm"
+                          size="sm"
+                        />
+                      </TableCell>
+                    </TableRow>
+                  );
+                } else {
+                  const tokenExchangeRateInfo = exchangeRateTable[tokenId];
+
+                  return (
+                    <TableRow key={tokenId}>
+                      <TableCell>{tokenId}</TableCell>
+                      <TableCell>{convertFromUSDTo(tokenExchangeRateInfo?.unitPrice)}</TableCell>
+                      <TableCell>{tokenExchangeRateInfo?.unitPrice}</TableCell>
+                      <TableCell>{formatDateTime(tokenExchangeRateInfo?.lastUpdDateTime)}</TableCell>
+                    </TableRow>
+                  );
+                }
+              })}
             </TableBody>
           </Table>
         </div>

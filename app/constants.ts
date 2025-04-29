@@ -1,4 +1,4 @@
-const FUN_API_KEY = process.env.FUN_API_KEY;
+export const FUN_API_KEY = process.env.FUN_API_KEY;
 const USDC_SYMBOL = "USDC";
 const ETH_SYMBOL = "ETH";
 const USDT_SYMBOL = "USDT";

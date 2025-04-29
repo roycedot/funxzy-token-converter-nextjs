@@ -14,13 +14,19 @@ We take the reciprocal of each unit price and multiply by the USD provided throu
 
 ## Caching
 
-I've added a cache for exchange rate for the coins. The cache expiration is arbitrarily set at 1 minute.
+I've added a "cache" for exchange rate for the coins within the main Home component. The exchange rate is stored in a state variable.
+
+This is mostly so when users are typing different values in the USD input form, we aren't sending requests to the Fun.xyz API on every input change.
 
 This is a trade-off - less requests to the Fun.xyz API vs exchange rate being less real-time.
 
 In production, depending on how resilient the back-end for the Fast.xyz API is and how important we think it is for Fun.xyz clients to get real-time exchange rates, this caching can be tweaked and/or removed.
 
 For example, perhaps free users of the Fast.xyz API are rate-limited on requests, so caching for a free API user is more important.
+
+The latest exchange rate can be retrieved by deselecting a token and re-selecting it.
+
+It could be more streamlined by having a refresh button in the last column of the table, so a user wouldn't have to de-select + reselect a token to get the latest conversion.
 
 ## Currency Filter Behavior
 
