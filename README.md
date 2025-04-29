@@ -63,3 +63,13 @@ Raw TailWind seemed like it may be too verbose, and Material UI could maybe be t
 ## Vercel Deployment
 
 The app is deployed on Vercel at https://funxzy-token-converter-nextjs-pa7x.vercel.app
+
+## Rounding
+
+I think rounding of either the unit price or calculated conversion should be applied to USDx tokens e.g. USDC, USDT
+
+Right now, 1 USD doesn't exactly convert to 1 USDC, USDT but the unit price returned from the API is not exactly 1.00
+
+## Testing
+
+I have omitted test suites for this. In production, things like Cypress and Jest could be useful.
