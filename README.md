@@ -26,6 +26,12 @@ So, this means, given an input of USD through the UI, we need to query how many 
 
 We take the reciprocal of each unit price and multiply by the USD provided through the UI.
 
+## Currency API Retries
+
+It could be useful to add a number retries, paired with a short sleep e.g. 500ms-1 sec between each try, around the Fun.xyz API calls (library and my own API Routes) in case there are failures. 
+
+I've ommitted these retries. 
+
 ## Caching
 
 I've added a "cache" for exchange rate for the coins within the main Home component. The exchange rate is stored in a state variable.
