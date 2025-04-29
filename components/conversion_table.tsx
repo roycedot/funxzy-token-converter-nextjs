@@ -16,6 +16,7 @@ import { TOKEN_SYMBOL_TO_CHAIN_ID } from "@/app/constants";
 import { subtitle } from "@/components/primitives";
 import { readTokenUnitPrice } from "@/utils/funxyz_api";
 import { ExchangeRateTableEntry } from "@/types";
+import { formatDateTime } from "@/utils/date_utils";
 
 export default function ConversionTable() {
   const [amountInUSD, setAmountInUSD] = useState<string>("1");
@@ -29,12 +30,23 @@ export default function ConversionTable() {
     [key: string]: ExchangeRateTableEntry;
   }>({});
 
+  /**
+   * Call-back to clear local state here when an API call errors out
+   *
+   * @param tokenId
+   * @param error
+   */
   function onGetPriceInfoError(tokenId: string, error: string) {
     deselectTokenId(tokenId);
     clearTokenIsLoading(tokenId);
+    // using rudimentary alert - a nicer stylized alert would be betterin PROD
     alert(tokenId + ": " + error);
   }
 
+  /**
+   * Clear a token from the selections - used on API error callback
+   * @param tokenId
+   */
   function deselectTokenId(tokenId: string) {
     const existingIdx = selectedTokenIds.indexOf(tokenId);
 
@@ -46,6 +58,10 @@ export default function ConversionTable() {
     }
   }
 
+  /**
+   * Clear a token as "is loading" state - used on API error callback
+   * @param tokenId
+   */
   function clearTokenIsLoading(tokenId: string) {
     const newLoadingTokenIds = new Set(loadingTokenIds);
 
@@ -53,6 +69,12 @@ export default function ConversionTable() {
     setLoadingTokenIds(newLoadingTokenIds);
   }
 
+  /**
+   * Callback when a token button is pressed, either
+   * -selects the button/token and makes an API call OR
+   * -deselects the button/token
+   * @param tokenId
+   */
   async function toggleCurrencySelected(tokenId: string) {
     const newSelectedTokenIds = selectedTokenIds.slice();
     const existingIdx = newSelectedTokenIds.indexOf(tokenId);
@@ -123,21 +145,6 @@ export default function ConversionTable() {
 
     // shouldn't get here
     return "";
-  }
-
-  /**
-   * Format a Date into a string of form YYYY-mm-DD HH:MM:SS
-   * e.g. "2025-04-29 03:53:15"
-   * @param date
-   */
-  function formatDateTime(date: Date | null): string {
-    if (!date) {
-      return "";
-    }
-    const intermediateString = date.toISOString().replace("T", " ");
-    const periodIdx = intermediateString.indexOf(".");
-
-    return intermediateString.substring(0, periodIdx);
   }
 
   return (

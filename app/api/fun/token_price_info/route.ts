@@ -3,6 +3,15 @@ import { NextRequest } from "next/server";
 
 import { FUN_API_KEY, TOKEN_SYMBOL_TO_CHAIN_ID } from "@/app/constants";
 
+/**
+ * This is essentially a proxy so the front-end can make a call to the Fun.xyz API
+ * w/o any API key information being passed from the front.
+ *
+ * This "proxies" Fun's getAssetPriceInfo() function
+ *
+ * @param request
+ * @constructor
+ */
 export async function GET(request: NextRequest) {
   if (!FUN_API_KEY) {
     const data = {
