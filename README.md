@@ -52,7 +52,7 @@ An alternative would have been to allow any number of coins to be selected beyon
 
 The middle-layer of this app is set up to cache exchange rates for up to 1 minute, so showing conversions for more than 2 coins would theoretically not be an extra network request if the UI interaction is within the cache time of 1 minute.
 
-And, it would, arguably, be a more useful product if it could show more than 2 coin conversions simultaneously.
+It would, arguably, be a more useful product if it could show more than 2 coin conversions simultaneously.
 
 ## Libraries
 
