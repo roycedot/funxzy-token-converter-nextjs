@@ -19,9 +19,16 @@ export const readTokenUnitPrice = async (
     const res = await fetch(url);
 
     try {
+      const responseJSON = await res.json();
+
+      if (responseJSON?.error) {
+        onError(tokenId, responseJSON?.error);
+
+        return null;
+      }
+
       // data has tokenAddress
-      exchangeRateInfo = await res.json();
-      exchangeRateTable[tokenId] = exchangeRateInfo;
+      exchangeRateTable[tokenId] = exchangeRateInfo = responseJSON;
     } catch (e) {
       // TODO possibly better parse the error message from Fun
       onError(tokenId, "Error fetching token address. Please try again.");
@@ -39,9 +46,15 @@ export const readTokenUnitPrice = async (
   const res = await fetch(url);
 
   try {
-    const data = await res.json();
+    const responseJSON = await res.json();
 
-    return data?.unitPrice;
+    if (responseJSON?.error) {
+      onError(tokenId, responseJSON?.error);
+
+      return null;
+    }
+
+    return responseJSON?.unitPrice;
   } catch (e) {
     // TODO possibly better parse the error message from Fun
     onError(tokenId, "Error fetching token unit price. Please try again.");

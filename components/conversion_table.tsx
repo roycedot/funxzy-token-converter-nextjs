@@ -32,7 +32,7 @@ export default function ConversionTable() {
   function onGetPriceInfoError(tokenId: string, error: string) {
     deselectTokenId(tokenId);
     clearTokenIsLoading(tokenId);
-    alert(error);
+    alert(tokenId + ": " + error);
   }
 
   function deselectTokenId(tokenId: string) {
@@ -133,7 +133,10 @@ export default function ConversionTable() {
    * e.g. "2025-04-29 03:53:15"
    * @param date
    */
-  function formatDateTime(date: Date): string {
+  function formatDateTime(date: Date | null): string {
+    if (!date) {
+      return "";
+    }
     const intermediateString = date.toISOString().replace("T", " ");
     const periodIdx = intermediateString.indexOf(".");
 
