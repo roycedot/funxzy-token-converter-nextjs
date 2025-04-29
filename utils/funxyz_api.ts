@@ -41,7 +41,7 @@ export const readTokenUnitPrice = async (
     "/api/fun/token_price_info?" +
     new URLSearchParams({
       tokenId,
-      tokenAddress: exchangeRateInfo.tokenAddress,
+      tokenAddress: exchangeRateInfo.tokenAddress.toString(),
     }).toString();
   const res = await fetch(url);
 
