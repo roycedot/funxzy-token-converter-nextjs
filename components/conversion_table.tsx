@@ -202,12 +202,19 @@ export default function ConversionTable() {
                 } else {
                   const tokenExchangeRateInfo = exchangeRateTable[tokenId];
 
+                  // @ts-ignore
+                  const converted = convertFromUSDTo(tokenExchangeRateInfo?.unitPrice)
+                  // @ts-ignore
+                  const unitPrice = tokenExchangeRateInfo?.unitPrice;
+                  // @ts-ignore
+                  const formattedLastUpdDateTimeStr = formatDateTime(tokenExchangeRateInfo?.lastUpdDateTime);
+
                   return (
                     <TableRow key={tokenId}>
                       <TableCell>{tokenId}</TableCell>
-                      <TableCell>{convertFromUSDTo(tokenExchangeRateInfo?.unitPrice)}</TableCell>
-                      <TableCell>{tokenExchangeRateInfo?.unitPrice}</TableCell>
-                      <TableCell>{formatDateTime(tokenExchangeRateInfo?.lastUpdDateTime)}</TableCell>
+                      <TableCell>{converted}</TableCell>
+                      <TableCell>{unitPrice?.toString()}</TableCell>
+                      <TableCell>{formattedLastUpdDateTimeStr}</TableCell>
                     </TableRow>
                   );
                 }
