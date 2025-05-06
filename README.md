@@ -54,7 +54,7 @@ The assignment PDF mentioned the UI is for token swaps with an input of USD. So,
 
 This ensures the last selected coin is always selected.
 
-An alternative would have been to allow any number of coins to be selected beyond 2, but I'm assuming the assignment requirements are specifying a FIFO queue for selections, essentially.
+An alternative would have been to allow any number of coins to be selected beyond 2, but I'm assuming the assignment requirements are specifying a LIFO queue for selections, essentially.
 
 The middle-layer of this app is set up to cache exchange rates for up to 1 minute, so showing conversions for more than 2 coins would theoretically not be an extra network request if the UI interaction is within the cache time of 1 minute.
 
